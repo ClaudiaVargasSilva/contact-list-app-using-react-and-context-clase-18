@@ -1,13 +1,21 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react"; //paso 1 para acceder a context
 import { Link } from "react-router-dom";
+import { Context } from "../store/appContext"; //paso 2 para acceder a context
 
 import { ContactCard } from "../component/ContactCard.js";
 import { Modal } from "../component/Modal";
+import { checkPropTypes } from "prop-types";
 
 export const Contacts = () => {
+	const { store, actions } = useContext(Context); //paso 3 para acceder a context
 	const [state, setState] = useState({
 		showModal: false
 	});
+
+	useEffect(() => {
+		actions.getData();
+	}, []);
+	console.log(store.contactList);
 
 	return (
 		<div className="container">
@@ -19,10 +27,16 @@ export const Contacts = () => {
 				</p>
 				<div id="contacts" className="panel-collapse collapse show" aria-expanded="true">
 					<ul className="list-group pull-down" id="contact-list">
-						<ContactCard onDelete={() => setState({ showModal: true })} />
-						<ContactCard />
-						<ContactCard />
-						<ContactCard />
+						{store.contactList.map((user, index) => (
+							<ContactCard
+								key={index}
+								contact={user}
+								onDelete={() => {
+									actions.addidDelete(user.id);
+									setState({ showModal: true });
+								}}
+							/>
+						))}
 					</ul>
 				</div>
 			</div>
